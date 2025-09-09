@@ -25,6 +25,15 @@ void Game::update()
 			
 			} //todo custom hp-
 		}
+		for (auto collidable : collidables) {
+			if (player.checkCollision(collidable, xdir, ydir)) {
+				collision = true;
+
+				break;
+			}
+		}
+		
+
 		
 		
 		//if no collision, keep the regular movement going.
@@ -157,6 +166,34 @@ void Game::parseMap()
 			
 			
 			}
+		}
+		}
+	auto objectGroups =map->GetObjectGroups();
+	for (auto objectGroup : objectGroups) {
+		auto objects =objectGroup->GetObjects();
+		
+		for (auto object : objects) {
+			//all the vertices on the polygon.
+			
+			float leftX = object->GetX();
+			float upY= object->GetY();
+			float width;
+			float height;
+			for(auto point : object->GetPolygon()->GetPoints() ){
+				std::cout << "points inside the polygon: " << point.x << " , " << point.y << " " << std::endl;
+				if (point.x > 0.f ) {
+					width = point.x;
+				}
+			
+				if (point.y > 0.f ) {
+					height = point.y ;
+				}
+			}
+
+			sf::FloatRect objectRect(sf::Vector2f(leftX,upY),sf::Vector2f(width, height ));
+			
+			std::cout <<"Left Top Most Coordinates: " << leftX << "," << upY << "Width: " << width << "Height: " << height <<  std::endl;
+			collidables.push_back(objectRect);
 		}
 	}
 	

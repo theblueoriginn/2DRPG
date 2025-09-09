@@ -18,6 +18,14 @@ bool Player::checkCollision(Enemy enemy,int xdir,int ydir)
 	
 	
 }
+bool Player::checkCollision(sf::FloatRect rect, int xdir, int ydir)
+{
+	sf::Vector2f nextPos = this->getPosition() + static_cast<sf::Vector2f>(sf::Vector2i({ xdir * step ,ydir * step }));
+	 
+	 return (rect.contains(nextPos));
+
+
+}
 
 Player::Player()
 {

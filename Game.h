@@ -53,7 +53,7 @@ private:
 	void initResources();
 	void parseMap();
 	std::vector<sf::Sprite> sprites;
-
+	std::vector<sf::FloatRect> collidables;
 	//update functions
 	void pollEvents();
 

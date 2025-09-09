@@ -12,6 +12,8 @@ private:
 public:
     void Move(int xdir,int ydir);
     bool checkCollision(Enemy enemy, int xdir, int ydir);
+    bool checkCollision(sf::FloatRect rect, int xdir, int ydir);
+    
     bool checkCollision(Enemy enemy);
     
     Player();
