@@ -10,6 +10,8 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <vector>
+#include <map>
+#include "tinytmx/tinytmx.hpp"
 
 
 class Game
@@ -31,6 +33,7 @@ private:
 	sf::Texture map_tx;
 	sf::Sprite* map_sp;
 
+	std::map<int  , sf::Texture*>tileTextures;
 
 	//players and enemies.
 
@@ -48,6 +51,8 @@ private:
 	void initVars();
 	void initTime();
 	void initResources();
+	void parseMap();
+	std::vector<sf::Sprite> sprites;
 
 	//update functions
 	void pollEvents();
@@ -57,6 +62,7 @@ public:
 	bool getGameIsOpen();
 	void update();
 	void render();
+
 	Game();
 	~Game();
 

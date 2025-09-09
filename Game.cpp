@@ -1,4 +1,6 @@
 #include "Game.h"
+
+
 bool Game::getGameIsOpen()
 {
 	return gameIsOpen;
@@ -41,7 +43,11 @@ void Game::render()
 {
 	this->window.clear();
 	this->window.setView(this->view);
-	this->window.draw(*this->map_sp);
+	//give the sfml drawable tiles here.
+	for (auto sprite : sprites) {
+		this->window.draw(sprite);
+	}
+
 	
 	this->window.draw(*player.getSprite());
 	for (auto it = enemies.begin(); it != enemies.end(); it++) {
@@ -87,6 +93,74 @@ void Game::initResources()
 	this->map_sp = new sf::Sprite(map_tx);
 
 }
+void Game::parseMap()
+{
+	//parse the map file.
+	tinytmx::Map* map = new tinytmx::Map();
+	std::string fileName = "res/maps/map.tmx";
+	map->ParseFile(fileName);
+	//add all textures of tilesets
+	
+	for (auto ts : map->GetTilesets()) {
+		//getsource returns the relative path of tileset to the map.
+		
+		int cnt = ts->GetFirstGid();
+		sf::Texture* tileTexture = new sf::Texture();
+		
+		if (!tileTexture->loadFromFile("res/maps/" + ts->GetImage()->GetSource()) ) {
+			std::cerr << "Failed to load texture: "
+				<< ts->GetImage()->GetSource() << std::endl;
+			delete tileTexture;
+			continue;
+		}
+		else{ 
+			
+			tileTextures[cnt] = tileTexture;
+			}
+		
+		
+	}
+	auto tileLayers=map->GetTileLayers();
+	for (auto layer : tileLayers) {
+		//we get the chunks
+		auto chunks =layer->GetDataTileFiniteMap();
+		for (int y = 0;y < chunks->GetHeight();y++) {
+			for (int x = 0;x < chunks->GetWidth();x++) { 
+				
+				auto tileGID = chunks->GetTileGid(x, y);
+				auto tileset = map->FindTileset(tileGID);
+				if (!tileset) { continue; }
+				auto tileID = tileGID-tileset->GetFirstGid();
+				//get floatRect for this tileID so we can add it as a sprite.
+				
+				//get tileset for this tile.
+				
+				
+				auto row = static_cast<int> (tileID / tileset->GetColumns());
+				auto column =static_cast<int> (tileID % tileset->GetColumns());
+				auto height = static_cast<int>(tileset->GetTileHeight());
+				auto width = static_cast<int>(tileset->GetTileWidth());
+				
+				tinytmx::Tile tile(tileID);
+				for (auto tx : tileTextures ) {
+					
+					if(tileset->GetFirstGid() == tx.first) {
+
+						sf::Sprite sprite(*tx.second, sf::IntRect(sf::Vector2i({ column * width,row * height }), sf::Vector2i({ width,height }) ));
+						sprite.setPosition(static_cast<sf::Vector2f>(sf::Vector2i({ x * width,y * width })));
+						sprites.push_back(sprite);
+					
+					}
+					
+				}
+
+			
+			
+			}
+		}
+	}
+	
+}
 void Game::pollEvents()
 {
 	auto ev = this->window.pollEvent();
@@ -98,6 +172,7 @@ void Game::pollEvents()
 		}
 		else if (key->scancode == sf::Keyboard::Scancode::Down) {
 			xdir = 0;ydir = 1;
+
 		}
 		
 	}
@@ -111,10 +186,17 @@ Game::Game()
 	
 	this->initResources();
 	this->initVars();
+	this->parseMap();
 
 }
 
 Game::~Game()
 {
-	
+	//delete all tiletextures and sprites.
+	for (auto& tileTexture : tileTextures) {
+		delete tileTexture.second;
+		tileTextures.erase(tileTexture.first);
+
+	}
+	sprites.clear();
 }
