@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "tinytmx/tinytmx.hpp"
+#include <sstream>
 
 
 class Game
@@ -21,17 +22,15 @@ private:
 	sf::RenderWindow window;
 	sf::View view;
 
-	//delta time & clock
-	//TODO Reset time / get time in beginning of each update cycle.
-	sf::Time time = sf::seconds(0.f);
-	sf::Clock clock;
-	sf::Time dt = sf::seconds(1.f / 60.f);
-	float deltaElapsed{0.f};
+
+
+	//fps
+	float fps;
+	sf::Font* hudFont;
+	sf::Text* fpsText;
+	std::stringstream stream;
 
 	bool gameIsOpen{ false };
-
-	sf::Texture map_tx;
-	sf::Sprite* map_sp;
 
 	std::map<int  , sf::Texture*>tileTextures;
 

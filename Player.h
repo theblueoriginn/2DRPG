@@ -16,6 +16,7 @@ private:
     int spriteHeight;
     
     sf::Texture* idleTex;
+    sf::Texture* idleLeftTex;
     sf::Texture* walkTex;
 public:
     void Move(int xdir,int ydir, float dt);
@@ -24,7 +25,7 @@ public:
     
     bool checkCollision(Enemy enemy);
     
-    std::string changeState(std::string state);
+    std::string changeState(std::string state, int xdir, int ydir);
     int nextFrame(int xdir, int ydir);
 
 

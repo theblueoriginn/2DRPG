@@ -18,9 +18,9 @@ int main()
 		dt_acc += dt;
 
 		game.update(dt);
-
+		//do this every 8th of a second.The higher timestep,the less it takes from main loop.
 		if (dt_acc >= timestep) {
-			//something to do on every timestep basis...
+			
 			game.update_fixed(timestep);
 			dt_acc -= timestep;
 		}
