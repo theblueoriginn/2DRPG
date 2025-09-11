@@ -7,15 +7,27 @@ class Player :
     public Character
 {
 private:
-    int step;
+    int speed;
     int health;
+    int currentIndex;
+  
+
+    int spriteWidth;
+    int spriteHeight;
+    
+    sf::Texture* idleTex;
+    sf::Texture* walkTex;
 public:
-    void Move(int xdir,int ydir);
-    bool checkCollision(Enemy enemy, int xdir, int ydir);
-    bool checkCollision(sf::FloatRect rect, int xdir, int ydir);
+    void Move(int xdir,int ydir, float dt);
+    bool checkCollision(Enemy enemy, int xdir, int ydir, float dt);
+    bool checkCollision(sf::FloatRect rect, int xdir, int ydir, float dt);
     
     bool checkCollision(Enemy enemy);
     
-    Player();
+    std::string changeState(std::string state);
+    int nextFrame(int xdir, int ydir);
+
+
+    Player(std::string idleSheet, std::string walkSheet, int spriteWidth, int spriteHeight);
 };
 

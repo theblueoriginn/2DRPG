@@ -5,7 +5,7 @@ class Enemy :
     public Character
 {
 private:
-    int step;
+    int speed;
     int health;
 public:
     void Move(int xdir, int ydir);
