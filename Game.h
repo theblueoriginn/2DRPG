@@ -38,7 +38,7 @@ private:
 	//players and enemies.
 
 	
-	
+	//Player* player
 	Player player;
 
 	int xdir = 0;
@@ -56,12 +56,14 @@ private:
 	std::vector<sf::FloatRect> collidables;
 	//update functions
 	void pollEvents();
+	bool keyHold{false};
 
 	//Constructor
 public:
 	bool getGameIsOpen();
-	void update();
-	void render();
+	void update(float dt);
+	void update_fixed(float timestep);
+	void render(float dt);
 
 	Game();
 	~Game();

@@ -1,13 +1,17 @@
 #include "Game.h"
 
-
+//bunch of frames, have states in the player class.
+//if state is -> idle
+//play idle animation.
+// --> play each scene with sync on dt.
+//get delta timing grasped?
 bool Game::getGameIsOpen()
 {
 	return gameIsOpen;
 }
-void Game::update()
+void Game::update(float dt)
 {
-	//TODO time logic
+	
 
 	//pollevents and update xdir, ydir.
 	this->pollEvents();
@@ -16,8 +20,8 @@ void Game::update()
 		bool collision = false;
 
 		for (auto it = enemies.begin(); it != enemies.end(); it++) {
-			//if collision, set it true to prevent movement. Then, break loop
-			if (player.checkCollision(*it,xdir,ydir)) { 
+		//if collision, set it true to prevent movement. Then, break loop
+			if (player.checkCollision(*it, xdir, ydir,dt)) {
 				
 				collision = true; 
 				
@@ -26,7 +30,7 @@ void Game::update()
 			} //todo custom hp-
 		}
 		for (auto collidable : collidables) {
-			if (player.checkCollision(collidable, xdir, ydir)) {
+			if (player.checkCollision(collidable, xdir, ydir, dt)) {
 				collision = true;
 
 				break;
@@ -37,18 +41,21 @@ void Game::update()
 		
 		
 		//if no collision, keep the regular movement going.
-		if (!collision) { player.Move(xdir, ydir); }
-		xdir = 0, ydir=0;
-
+		if (!collision) { player.Move(xdir, ydir,dt); }
 	}
 	
 	/*std::cout << player.getPosition().x << " " << player.getPosition().y << std::endl;*/
 	//center the camera to the character.
 	if (view.getCenter() != player.getPosition()) { view.setCenter(player.getPosition()); }
-	
+	//update dt
 	
 }
-void Game::render()
+void Game::update_fixed(float timestep) {
+	std::cout << "current frame #: " << this->player.nextFrame() << std::endl;
+	//get all sprites to the same pos.
+	
+}
+void Game::render(float dt)
 {
 	this->window.clear();
 	this->window.setView(this->view);
@@ -58,11 +65,12 @@ void Game::render()
 	}
 
 	
-	this->window.draw(*player.getSprite());
 	for (auto it = enemies.begin(); it != enemies.end(); it++) {
 		this->window.draw( (*it->getSprite()) );
 	}
 
+	this->window.draw(*this->player.getCurrentSprite());
+	
 	this->window.display();
 	
 }
@@ -73,6 +81,7 @@ void Game::initWindow()
 
     this->view.setCenter(static_cast<sf::Vector2f>(sf::Vector2u(this->window.getSize().x / 2, this->window.getSize().y / 2)));
 	this->view.setSize(static_cast<sf::Vector2f>(sf::Vector2u(this->window.getSize().x , this->window.getSize().y ) ));
+	this->view.zoom(0.50);
 }
 void Game::initVars()
 {
@@ -80,9 +89,7 @@ void Game::initVars()
 }
 void Game::initResources()
 {
-	//CHARACTERS
-	this->player.setSprite("res\\img\\character.png");
-	this->player.setPosition(sf::Vector2f({ 96,96 }));
+	
 	
 	this->enemy.setSprite("res\\img\\character.png");
 	this->enemy.setPosition(sf::Vector2f({ 144,144 }));
@@ -202,17 +209,52 @@ void Game::pollEvents()
 {
 	auto ev = this->window.pollEvent();
 	if (auto key = ev->getIf<sf::Event::KeyPressed>()) {
-		if (key->scancode == sf::Keyboard::Scancode::Left) { xdir = -1; ydir = 0; }
-		else if (key->scancode == sf::Keyboard::Scancode::Right) { xdir = 1; ydir = 0; }
-		else if (key->scancode == sf::Keyboard::Scancode::Up) {
-			xdir = 0;ydir = -1;
+		if (key->scancode == sf::Keyboard::Scancode::Left && !keyHold) { xdir = -1; ydir = 0;std::cout << "Player State Changed to: " << this->player.changeState("walk");
+		keyHold = true;
 		}
-		else if (key->scancode == sf::Keyboard::Scancode::Down) {
-			xdir = 0;ydir = 1;
-
+		else if (key->scancode == sf::Keyboard::Scancode::Right && !keyHold) { xdir = 1; ydir = 0; std::cout << "Player State Changed to: " << this->player.changeState("walk");
+		keyHold = true;
+		}
+		else if (key->scancode == sf::Keyboard::Scancode::Up && !keyHold) {
+			xdir = 0;ydir = -1;std::cout << "Player State Changed to: " << this->player.changeState("walk");
+			keyHold = true;
+		}
+		else if (key->scancode == sf::Keyboard::Scancode::Down && !keyHold) {
+			xdir = 0;ydir = 1;std::cout << "Player State Changed to: " << this->player.changeState("walk");
+			keyHold = true;
+			
+			
 		}
 		
 	}
+	else if (const sf::Event::KeyReleased* releasedKey = ev->getIf<sf::Event::KeyReleased>()) {
+		switch (releasedKey->scancode) {
+		case sf::Keyboard::Scancode::Right:
+			xdir = 0;
+			ydir = 0;
+			std::cout << "Player State Changed to: " << this->player.changeState("idle");
+			keyHold = false;
+		case sf::Keyboard::Scancode::Left :
+			xdir = 0;
+			ydir = 0;
+			std::cout << "Player State Changed to: " << this->player.changeState("idle");
+			keyHold = false;
+		case sf::Keyboard::Scancode::Up :
+			xdir = 0;
+			ydir = 0;
+			std::cout << "Player State Changed to: " << this->player.changeState("idle");
+			keyHold = false;
+		case sf::Keyboard::Scancode::Down:
+			xdir = 0;
+			ydir = 0;
+			std::cout << "Player State Changed to: " << this->player.changeState("idle");
+			keyHold = false;
+			
+		}
+		
+	}
+	
+	
 }
 
 //Constructor
@@ -224,6 +266,8 @@ Game::Game()
 	this->initResources();
 	this->initVars();
 	this->parseMap();
+	//call the constructor here, so that the sprites are added here to the frame maps.
+	//this->player = new Player...
 
 }
 

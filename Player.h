@@ -1,20 +1,36 @@
 #pragma once
 #include "Character.h"
-
+#include <map>
 #include <iostream>
 class Enemy;
 class Player :
     public Character
 {
 private:
-    int step;
+    int speed;
     int health;
+    std::string state;
+    int frame;
 public:
-    void Move(int xdir,int ydir);
-    bool checkCollision(Enemy enemy, int xdir, int ydir);
-    bool checkCollision(sf::FloatRect rect, int xdir, int ydir);
+    //movement logic
     
-    bool checkCollision(Enemy enemy);
+    void Move(int xdir, int ydir, float dt);
+    bool checkCollision(Enemy enemy, int xdir, int ydir, float dt);
+   
+    bool checkCollision(sf::FloatRect rect, int xdir, int ydir, float dt);
+    
+
+    //animation logic and state logic.
+    bool startedAnim{ false };
+    std::string changeState(std::string state);
+    int nextFrame();
+    sf::Sprite* getCurrentSprite();
+    
+    sf::Texture idleSpriteSheet;
+    std::map<int,sf::Sprite* > idle_frames;
+
+    sf::Texture walkSpriteSheet;
+    std::map<int, sf::Sprite* > walk_frames;
     
     Player();
 };

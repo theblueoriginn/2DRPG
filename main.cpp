@@ -1,11 +1,38 @@
 #include "Game.h"
+#include "main.h"
 
 int main()
 {
 	Game game;
+
+	
+	float time=0.f;
+	float lastTick=0.f;
+	sf::Clock clock;
+	clock.start();
+	
+	float dt=0.f;
+	float dt_accum = 0.f;
+	float timestep = 1.f / 8.f;  //each frame takes 125ms
 	while(game.getGameIsOpen() ) {
-		game.update();
-		game.render();
+		time = clock.getElapsedTime().asSeconds();
+		dt = time - lastTick;
+		lastTick = time;
+		dt_accum += dt;
+		
+		//std::cout << "dt: " << dt <<" secs" << dt*1000 << "/ms" << " fps: " << 1.f / dt << std::endl;
+		
+		//TODO add dt to this functions.
+		
+		game.update(dt);
+		while (dt_accum >= timestep) {
+			dt_accum -= timestep;
+			//do something on fixed timestep... //it has to be something inexpensive.
+			
+			game.update_fixed(timestep);
+
+		}
+		game.render(dt);
 	}
 	return 0;
 }

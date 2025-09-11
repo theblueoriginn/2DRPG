@@ -29,7 +29,7 @@ void Character::setSprite(std::string textureAdress)
 void Character::setPosition(sf::Vector2f pos)
 {
 	this->position = pos;
-	if (this->sprite !=nullptr) { this->getSprite()->setPosition(pos); }
+	/*if (this->sprite !=nullptr) { this->getSprite()->setPosition(pos); }*/
 	
 }
 
