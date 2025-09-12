@@ -1,6 +1,6 @@
 #pragma once
 #include "Character.h"
-#include <map>
+
 #include <iostream>
 class Enemy;
 class Player :
@@ -9,29 +9,26 @@ class Player :
 private:
     int speed;
     int health;
-    std::string state;
-    int frame;
-public:
-    //movement logic
+    int currentIndex;
+  
+
+    int spriteWidth;
+    int spriteHeight;
     
-    void Move(int xdir, int ydir, float dt);
+    sf::Texture* idleTex;
+    sf::Texture* idleLeftTex;
+    sf::Texture* walkTex;
+public:
+    void Move(int xdir,int ydir, float dt);
     bool checkCollision(Enemy enemy, int xdir, int ydir, float dt);
-   
     bool checkCollision(sf::FloatRect rect, int xdir, int ydir, float dt);
     
-
-    //animation logic and state logic.
-    bool startedAnim{ false };
-    std::string changeState(std::string state);
-    int nextFrame();
-    sf::Sprite* getCurrentSprite();
+    bool checkCollision(Enemy enemy);
     
-    sf::Texture idleSpriteSheet;
-    std::map<int,sf::Sprite* > idle_frames;
+    std::string changeState(std::string state, int xdir, int ydir);
+    int nextFrame(int xdir, int ydir);
 
-    sf::Texture walkSpriteSheet;
-    std::map<int, sf::Sprite* > walk_frames;
-    
-    Player();
+
+    Player(std::string idleSheet, std::string walkSheet, int spriteWidth, int spriteHeight);
 };
 
