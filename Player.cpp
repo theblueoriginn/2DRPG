@@ -67,7 +67,7 @@ int Player::nextFrame(int xdir, int ydir)
 Player::Player(std::string idleSheet, std::string walkSheet, int spriteWidth, int spriteHeight) : spriteWidth(spriteWidth), spriteHeight(spriteWidth)
 {
 	//super call
-	this->speed = 32;
+	this->speed = 128;
 	this->health = 100;
 	this->currentIndex = 0;
 
