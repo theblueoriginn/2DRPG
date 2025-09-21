@@ -48,11 +48,11 @@ void Game::update(float dt)
 	if (view.getCenter() != player->getPosition()) { view.setCenter(player->getPosition()); }
 	this->fps = 1 / dt;
 
-	this->stream << "fps: " << std::fixed << std::setprecision(2) << this-> fps;
+	this->stream << "fps: " << std::fixed << std::setprecision(2) << this->fps;
 
 	this->fpsText->setString(this->stream.str());
 	this->fpsText->setPosition({ this->view.getCenter().x - 200 , this->view.getCenter().y - 200 });
-	this->stream.str(std::string() );
+	this->stream.str(std::string());
 }
 void Game::update_fixed(float timestep) {
 	std::cout << "GAME::UPDATE current frame: " << this->player->nextFrame(xdir, ydir) << std::endl;
@@ -60,7 +60,7 @@ void Game::update_fixed(float timestep) {
 void Game::render(float dt)
 {
 	this->window.clear();
-	
+
 	this->window.setView(this->view);
 	//give the sfml drawable tiles here.
 	for (auto sprite : sprites) {
@@ -72,7 +72,7 @@ void Game::render(float dt)
 
 	this->window.draw(*player->getSprite());
 	this->window.draw(*fpsText);
-	
+
 
 	this->window.display();
 
@@ -91,9 +91,9 @@ void Game::initWindow()
 }
 void Game::initVars()
 {
-	
+
 	this->gameIsOpen = true;
-	
+
 
 
 
@@ -109,7 +109,7 @@ void Game::initResources()
 
 
 	//HUD AND TEXTS
-	try{ this->hudFont = new sf::Font("res\\fonts\\arial.ttf"); }
+	try { this->hudFont = new sf::Font("res\\fonts\\arial.ttf"); }
 	catch (int e) { std::cout << e; }
 	this->fpsText = new sf::Text(*hudFont, "fps:");
 
@@ -212,23 +212,24 @@ void Game::parseMap()
 }
 void Game::pollEvents()
 {
-	auto ev = this->window.pollEvent();
-	if (auto key = ev->getIf<sf::Event::KeyPressed>()) {
-		if (key->scancode == sf::Keyboard::Scancode::Left && !keyHold) { xdir = -1; ydir = 0; std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl; keyHold = true; }
-		else if (key->scancode == sf::Keyboard::Scancode::Right && !keyHold) {
-			xdir = 1; ydir = 0;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
+	if (const auto ev = this->window.pollEvent()) {
+		if (const auto* key = ev->getIf<sf::Event::KeyPressed>()) {
+			if (key->scancode == sf::Keyboard::Scancode::Left && !keyHold) { xdir = -1; ydir = 0; std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl; keyHold = true; }
+			else if (key->scancode == sf::Keyboard::Scancode::Right && !keyHold) {
+				xdir = 1; ydir = 0;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
+			}
+			else if (key->scancode == sf::Keyboard::Scancode::Up && !keyHold) {
+				xdir = 0;ydir = -1;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
+			}
+			else if (key->scancode == sf::Keyboard::Scancode::Down && !keyHold) {
+				xdir = 0;ydir = 1;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
+			}
 		}
-		else if (key->scancode == sf::Keyboard::Scancode::Up && !keyHold) {
-			xdir = 0;ydir = -1;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
-		}
-		else if (key->scancode == sf::Keyboard::Scancode::Down && !keyHold) {
-			xdir = 0;ydir = 1;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
-		}
-	}
-	else if (auto key = ev->getIf<sf::Event::KeyReleased>()) {
-		if (key->scancode == sf::Keyboard::Scancode::Left || key->scancode == sf::Keyboard::Scancode::Right || key->scancode == sf::Keyboard::Scancode::Up || key->scancode == sf::Keyboard::Scancode::Down) {
-			xdir = 0; ydir = 0; std::cout << "GAME:pollEvents change state: " << this->player->changeState("idle", xdir, ydir) << std::endl; keyHold = false;
+		else if (const auto* key = ev->getIf<sf::Event::KeyReleased>()) {
+			if (key->scancode == sf::Keyboard::Scancode::Left || key->scancode == sf::Keyboard::Scancode::Right || key->scancode == sf::Keyboard::Scancode::Up || key->scancode == sf::Keyboard::Scancode::Down) {
+				xdir = 0; ydir = 0; std::cout << "GAME:pollEvents change state: " << this->player->changeState("idle", xdir, ydir) << std::endl; keyHold = false;
 
+			}
 		}
 	}
 }
