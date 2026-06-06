@@ -14,6 +14,9 @@
 #include "tinytmx/tinytmx.hpp"
 #include <sstream>
 
+#include "scene.h"
+typedef sf::Vector2f v2f;
+#define INTERACTION_DISTANCE 64.f
 
 class Game
 {
@@ -21,7 +24,8 @@ private:
 	//window and view
 	sf::RenderWindow window;
 	sf::View view;
-
+	//scene
+	scene gameScene;
 
 
 	//fps
@@ -54,8 +58,11 @@ private:
 	std::vector<sf::Sprite> sprites;
 	std::vector<sf::FloatRect> collidables;
 	//update functions
-	void pollEvents();
+	void pollEvents(float dt);
+	bool nearEnemies(float dt, Enemy enemy);
 	bool keyHold{false};
+
+	bool collidesEnemies(float dt);
 
 	//Constructor
 public:

@@ -8,7 +8,9 @@ void Enemy::Move(int xdir, int ydir)
 
 
 }
+
 Enemy::Enemy() {
 	this->speed = 48;
 	this->health = 30;
+	
 }

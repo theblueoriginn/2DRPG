@@ -2,10 +2,19 @@
 #include "Enemy.h"
 void Player::Move(int xdir, int ydir, float dt)
 {
-
+	
 	this->setPosition(this->getPosition() + sf::Vector2f({ xdir * speed * dt ,ydir * speed * dt }));
 
 	//this->sprite->setPosition(this->position);
+
+	//play the step sound.
+
+
+	std::cout << "UPDATE::MOVE::PLAY" << std::endl;
+	//TODO fix sound system.
+	stepSound->play();
+	
+	
 
 
 }
@@ -58,7 +67,7 @@ int Player::nextFrame(int xdir, int ydir)
 Player::Player(std::string idleSheet, std::string walkSheet, int spriteWidth, int spriteHeight) : spriteWidth(spriteWidth), spriteHeight(spriteWidth)
 {
 	//super call
-	this->speed = 32;
+	this->speed = 128;
 	this->health = 100;
 	this->currentIndex = 0;
 
@@ -78,6 +87,11 @@ Player::Player(std::string idleSheet, std::string walkSheet, int spriteWidth, in
 	//cut it to the first frame.
 	this->sprite->setTextureRect(sf::IntRect({ 0,0 }, { this->spriteWidth,this->spriteHeight }));
 	this->sprite->setOrigin({ float(this->spriteWidth/2), float(this->spriteHeight/2) });
+
+	//sound
+	stepSound = new sf::Sound(stepBuf);
+	stepBuf.loadFromFile("res/audio/step.wav");
+	stepSound->setBuffer(stepBuf);
 
 }
 

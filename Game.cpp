@@ -12,40 +12,40 @@ bool Game::getGameIsOpen()
 }
 void Game::update(float dt)
 {
-	this->pollEvents();
-	if (xdir != 0 || ydir != 0) {
-		bool collision = false;
+	this->pollEvents(dt);
+	switch (this->gameScene) {
+	case scene::map:
+		if (xdir != 0 || ydir != 0) {
+			bool collision = false;
 
-		for (auto it = enemies.begin(); it != enemies.end(); it++) {
-			//if collision, set it true to prevent movement. Then, break loop
-			if (player->checkCollision(*it, xdir, ydir, dt)) {
+			collision = collidesEnemies(dt);
+			for (auto collidable : collidables) {
+				if (player->checkCollision(collidable, xdir, ydir, dt)) {
+					collision = true;
 
-				collision = true;
-
-				break;
-
-			} //todo custom hp-
-		}
-		for (auto collidable : collidables) {
-			if (player->checkCollision(collidable, xdir, ydir, dt)) {
-				collision = true;
-
-				break;
+					break;
+				}
 			}
+
+
+
+
+			//if no collision, keep the regular movement going.
+			if (!collision) { player->Move(xdir, ydir, dt); }
+
+
 		}
 
 
+		//center the camera to the character.
+		if (view.getCenter() != player->getPosition()) { view.setCenter(player->getPosition()); }
+		break;
+	case scene::fight:
 
-
-		//if no collision, keep the regular movement going.
-		if (!collision) { player->Move(xdir, ydir, dt); }
-
-
+		break;
 	}
 
 
-	//center the camera to the character.
-	if (view.getCenter() != player->getPosition()) { view.setCenter(player->getPosition()); }
 	this->fps = 1 / dt;
 
 	this->stream << "fps: " << std::fixed << std::setprecision(2) << this->fps;
@@ -61,16 +61,31 @@ void Game::render(float dt)
 {
 	this->window.clear();
 
-	this->window.setView(this->view);
-	//give the sfml drawable tiles here.
-	for (auto sprite : sprites) {
-		this->window.draw(sprite);
-	}
-	for (auto it = enemies.begin(); it != enemies.end(); it++) {
-		this->window.draw((*it->getSprite()));
+	switch (this->gameScene) {
+	case scene::map:
+		this->window.setView(this->view);
+		//give the sfml drawable tiles here.
+		for (auto sprite : sprites) {
+			this->window.draw(sprite);
+		}
+		for (auto it = enemies.begin(); it != enemies.end(); it++) {
+			this->window.draw((*it->getSprite()));
+		}
+
+		this->window.draw(*player->getSprite());
+
+		break;
+	case scene::fight:
+		for (auto it = enemies.begin(); it != enemies.end(); it++) {
+			if (it->getScene() == scene::fight)
+				this->window.draw((*it->getSprite()));
+		}
+		if (this->player->getScene() == scene::fight) {
+			this->window.draw(*player->getSprite());
+		}
+		break;
 	}
 
-	this->window.draw(*player->getSprite());
 	this->window.draw(*fpsText);
 
 
@@ -210,8 +225,9 @@ void Game::parseMap()
 	}
 
 }
-void Game::pollEvents()
+void Game::pollEvents(float dt)
 {
+	//TODO CHANGE CONTROLS BY GAMESCENE...
 	if (const auto ev = this->window.pollEvent()) {
 		if (const auto* key = ev->getIf<sf::Event::KeyPressed>()) {
 			if (key->scancode == sf::Keyboard::Scancode::Left && !keyHold) { xdir = -1; ydir = 0; std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl; keyHold = true; }
@@ -224,6 +240,21 @@ void Game::pollEvents()
 			else if (key->scancode == sf::Keyboard::Scancode::Down && !keyHold) {
 				xdir = 0;ydir = 1;std::cout << "GAME:pollEvents change state: " << this->player->changeState("walk", xdir, ydir) << std::endl;keyHold = true;
 			}
+			else if (key->scancode == sf::Keyboard::Scancode::K) {
+
+				//if near enemy change the scene to fight.
+				for (auto& enemy : enemies) {
+					if (nearEnemies(dt, enemy)) {
+						this->gameScene = scene::fight;
+						enemy.setScene(scene::fight);
+						player->setScene(scene::fight);
+
+
+					}
+
+
+				}
+			}
 		}
 		else if (const auto* key = ev->getIf<sf::Event::KeyReleased>()) {
 			if (key->scancode == sf::Keyboard::Scancode::Left || key->scancode == sf::Keyboard::Scancode::Right || key->scancode == sf::Keyboard::Scancode::Up || key->scancode == sf::Keyboard::Scancode::Down) {
@@ -231,7 +262,29 @@ void Game::pollEvents()
 
 			}
 		}
+
 	}
+}
+
+bool Game::nearEnemies(float dt, Enemy enemy)
+{
+
+	//if collision, set it true to prevent movement. Then, break loop
+	auto distance = (enemy.getPosition() - this->player->getPosition()).length();
+
+	return (distance <= INTERACTION_DISTANCE);
+}
+
+bool Game::collidesEnemies(float dt)
+{
+	for (auto it = enemies.begin(); it != enemies.end(); it++) {
+		//if collision, set it true to prevent movement. Then, break loop
+		if (player->checkCollision(*it, xdir, ydir, dt)) {
+
+			return true;
+		}
+	}
+	return false;
 }
 
 //Constructor
@@ -243,6 +296,8 @@ Game::Game()
 	this->initResources();
 	this->initVars();
 	this->parseMap();
+
+	this->gameScene = scene::map;
 
 }
 

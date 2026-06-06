@@ -3,6 +3,7 @@
 
 
 
+
 sf::Sprite* Character::getSprite() { 
 	
 	return sprite;
@@ -13,6 +14,10 @@ sf::Texture Character::getTexture()
 {
 	
 	return this->texture;
+}
+scene Character::getScene()
+{
+	return this->sc;
 }
 sf::Vector2f Character::getPosition() {
 	
@@ -32,7 +37,10 @@ void Character::setPosition(sf::Vector2f pos)
 	if (this->sprite !=nullptr) { this->getSprite()->setPosition(pos); }
 	
 }
-
+void Character::setScene(scene sc)
+{
+	this->sc = sc;
+}
 
 //create a character with texture of adress  and set its location
 Character::Character(std::string textureAdress, sf::Vector2f startingPosition = sf::Vector2f({0.f,0.f})) : position(startingPosition)
@@ -41,7 +49,7 @@ Character::Character(std::string textureAdress, sf::Vector2f startingPosition = 
 	if(this->texture.loadFromFile(textureAdress)){}
 	this->sprite = new sf::Sprite(this->texture);
 	this->setPosition(this->position);
-	std::cout << "Call From Character text start ";
+	this->setScene(scene::map);
 
 	
 }
@@ -52,7 +60,8 @@ Character::Character(std::string textureAdress) : position(sf::Vector2f({ 0.f,0.
 	if (this->texture.loadFromFile(textureAdress)) {}
 	this->sprite = new sf::Sprite(texture);
 	this->setPosition(this->position);
-	std::cout << "Call From Character text ";
+	this->setScene(scene::map);
+	
 
 
 }
@@ -61,6 +70,8 @@ Character::Character() : sprite(nullptr) , position(sf::Vector2f({ 0.f,0.f }))
 {
 	
 	this->setPosition(this->position);
-	std::cout << "Call From Character ";
+	this->setScene(scene::map);
+	
+	
 
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include "Character.h"
+#include "SFML/Audio/Sound.hpp"
+#include "SFML/Audio/SoundBuffer.hpp"
 
 #include <iostream>
 class Enemy;
@@ -18,6 +20,11 @@ private:
     sf::Texture* idleTex;
     sf::Texture* idleLeftTex;
     sf::Texture* walkTex;
+
+    //step sound.
+    sf::SoundBuffer stepBuf;
+    sf::Sound* stepSound;
+    
 public:
     void Move(int xdir,int ydir, float dt);
     bool checkCollision(Enemy enemy, int xdir, int ydir, float dt);
